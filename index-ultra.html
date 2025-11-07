@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CyberSim Ultra - The most advanced incident response training platform with WebGL 3D visualization">
+  <title>CyberSim Ultra - Professional Incident Response Training</title>
+
+  <!-- Preconnect to CDNs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <!-- Professional Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="game-styles-ultra.css">
+
+  <!-- Three.js for WebGL 3D Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+
+  <!-- Meta Tags for Sharing -->
+  <meta property="og:title" content="CyberSim Ultra - Professional Incident Response Training">
+  <meta property="og:description" content="Train like the pros with WebGL 3D visualization, real malware simulations, and cutting-edge technology">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <style>
+    /* Inline critical CSS for instant loading */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0a0e1a;
+      color: #f8fafc;
+    }
+
+    #game-container {
+      min-height: 100vh;
+    }
+
+    /* Loading Screen - Show Immediately */
+    #initial-loader {
+      position: fixed;
+      inset: 0;
+      background: #0a0e1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #initial-loader .loader-content {
+      text-align: center;
+    }
+
+    #initial-loader .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(0, 115, 255, 0.2);
+      border-top-color: #0073ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #initial-loader .loader-text {
+      color: #cbd5e1;
+      font-size: 1.125rem;
+      font-weight: 500;
+    }
+
+    #initial-loader .loader-subtitle {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Initial Loader (shown before JavaScript loads) -->
+  <div id="initial-loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">🛡️ CyberSim Ultra</div>
+      <div class="loader-subtitle">Loading cutting-edge technology...</div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div id="game-container"></div>
+
+  <!-- Load JavaScript Files -->
+  <script>
+    // Configuration
+    window.CYBERSIM_CONFIG = {
+      version: '4.0.0-ultra',
+      enableWebGL: typeof THREE !== 'undefined',
+      enable3D: true,
+      enableAudio: true,
+      enableParticles: true,
+      debugMode: false
+    };
+
+    // Hide initial loader when page loads
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('initial-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        loader.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => loader.remove(), 300);
+      }
+    });
+
+    // Error handling
+    window.addEventListener('error', (e) => {
+      console.error('Global error:', e.error);
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('Unhandled promise rejection:', e.reason);
+    });
+  </script>
+
+  <!-- Load Game Engine -->
+  <script src="game-engine-ultra.js"></script>
+
+  <!-- Analytics (optional - remove in production if not needed) -->
+  <script>
+    // Simple analytics
+    console.log('🎮 CyberSim Ultra starting...');
+    console.log('Platform:', navigator.platform);
+    console.log('User Agent:', navigator.userAgent);
+    console.log('Screen:', `${window.screen.width}x${window.screen.height}`);
+    console.log('WebGL Support:', window.CYBERSIM_CONFIG.enableWebGL);
+  </script>
+
+  <!-- Service Worker Registration (for PWA support) -->
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        // Service worker would be registered here for offline support
+        console.log('✅ Service Worker support available');
+      });
+    }
+  </script>
+
+  <!-- Preload Critical Assets -->
+  <script>
+    // Preload critical resources
+    const preloadResources = [
+      // Add any critical assets here
+    ];
+
+    preloadResources.forEach(url => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = url;
+      link.as = url.endsWith('.js') ? 'script' : 'style';
+      document.head.appendChild(link);
+    });
+  </script>
+
+  <!-- Performance Monitoring -->
+  <script>
+    // Monitor performance
+    if (performance && performance.timing) {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const timing = performance.timing;
+          const loadTime = timing.loadEventEnd - timing.navigationStart;
+          const domReadyTime = timing.domContentLoadedEventEnd - timing.navigationStart;
+          const renderTime = timing.domComplete - timing.domLoading;
+
+          console.log('📊 Performance Metrics:');
+          console.log(`  Page Load Time: ${loadTime}ms`);
+          console.log(`  DOM Ready Time: ${domReadyTime}ms`);
+          console.log(`  Render Time: ${renderTime}ms`);
+
+          // Show performance warning if slow
+          if (loadTime > 5000) {
+            console.warn('⚠️ Page load time is slow. Consider optimizing assets.');
+          }
+        }, 1000);
+      });
+    }
+  </script>
+
+  <!-- Debug Panel (only in development) -->
+  <script>
+    if (window.CYBERSIM_CONFIG.debugMode) {
+      // Create debug panel
+      const debugPanel = document.createElement('div');
+      debugPanel.id = 'debug-panel';
+      debugPanel.style.cssText = `
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        color: #00ff00;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        border-radius: 4px;
+        z-index: 10000;
+        max-width: 300px;
+      `;
+
+      document.body.appendChild(debugPanel);
+
+      // Update debug info
+      setInterval(() => {
+        const fps = Math.round(1000 / (performance.now() - (window._lastFrame || 0)));
+        window._lastFrame = performance.now();
+
+        debugPanel.innerHTML = `
+          <strong>DEBUG MODE</strong><br>
+          FPS: ${fps || 0}<br>
+          Memory: ${(performance.memory?.usedJSHeapSize / 1048576).toFixed(2) || 'N/A'} MB<br>
+          Mode: ${game?.state?.game?.mode || 'loading'}
+        `;
+      }, 1000);
+    }
+  </script>
+
+  <!-- Accessibility Enhancements -->
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="aria-announcer"></div>
+
+  <script>
+    // Announce important events to screen readers
+    window.announceToScreenReader = (message) => {
+      const announcer = document.getElementById('aria-announcer');
+      if (announcer) {
+        announcer.textContent = message;
+        setTimeout(() => {
+          announcer.textContent = '';
+        }, 1000);
+      }
+    };
+  </script>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="data:application/json,{
+    %22name%22:%22CyberSim%20Ultra%22,
+    %22short_name%22:%22CyberSim%22,
+    %22description%22:%22Professional%20Incident%20Response%20Training%22,
+    %22start_url%22:%22index-ultra.html%22,
+    %22display%22:%22standalone%22,
+    %22background_color%22:%22%230a0e1a%22,
+    %22theme_color%22:%22%230073ff%22,
+    %22icons%22:[]
+  }">
+
+  <!-- Theme Color for Mobile Browsers -->
+  <meta name="theme-color" content="#0073ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- No-script Fallback -->
+  <noscript>
+    <div style="
+      position: fixed;
+      inset: 0;
+      background: #0a0e1a;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+    ">
+      <div>
+        <h1 style="font-size: 2rem; margin-bottom: 1rem;">🛡️ CyberSim Ultra</h1>
+        <p style="font-size: 1.125rem; color: #cbd5e1;">
+          JavaScript is required to run this application.
+        </p>
+        <p style="margin-top: 1rem; color: #64748b;">
+          Please enable JavaScript in your browser settings and reload the page.
+        </p>
+      </div>
+    </div>
+  </noscript>
+
+  <!-- Print Styles -->
+  <style media="print">
+    * {
+      background: white !important;
+      color: black !important;
+    }
+
+    #initial-loader,
+    .ultra-modal,
+    .ultra-toasts,
+    .command-palette {
+      display: none !important;
+    }
+  </style>
+</body>
+</html>
