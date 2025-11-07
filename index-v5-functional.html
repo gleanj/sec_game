@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CyberSim Ultra - Professional Incident Response Training with Real Threat Intelligence">
+  <title>CyberSim Ultra v5.0 - Fully Functional Edition</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="game-styles-ultra.css">
+  <link rel="stylesheet" href="game-styles-v5.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+
+  <style>
+    /* Critical inline styles for instant rendering */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0a0e1a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    #game-container {
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Loading spinner */
+    .loading-spinner {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0e1a;
+      z-index: 9999;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(0, 115, 255, 0.2);
+      border-top-color: #0073ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      position: absolute;
+      bottom: 40%;
+      color: #cbd5e1;
+      font-size: 1.125rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-spinner" id="initial-loader">
+    <div class="spinner"></div>
+    <div class="loading-text">🛡️ Loading CyberSim Ultra...</div>
+  </div>
+
+  <!-- Main Container -->
+  <div id="game-container"></div>
+
+  <!-- Toast Container (created dynamically) -->
+  <div id="ultra-toasts" class="ultra-toasts"></div>
+
+  <!-- Load JavaScript in correct order -->
+
+  <!-- 1. Load libraries first -->
+  <script src="ioc-library.js"></script>
+  <script src="scenario-library.js"></script>
+  <script src="tool-simulator.js"></script>
+
+  <!-- 2. Load UI components (from ultra engine, they're classes we need) -->
+  <script>
+    // Extract UI classes from the ultra engine for reuse
+    // These are defined inline since we need them before the main engine loads
+
+    class UISystem {
+      constructor(game) {
+        this.game = game;
+        this.modalStack = [];
+        this.toastQueue = [];
+      }
+
+      showModal(content, options = {}) {
+        const modal = document.createElement('div');
+        modal.className = 'ultra-modal';
+        modal.dataset.modalId = Date.now();
+
+        const closeBtn = options.showClose !== false ? `
+          <button class="modal-close" aria-label="Close">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        ` : '';
+
+        modal.innerHTML = `
+          <div class="modal-backdrop"></div>
+          <div class="modal-container ${options.size || 'medium'}">
+            ${closeBtn}
+            <div class="modal-content">
+              ${content}
+            </div>
+          </div>
+        `;
+
+        const closeButton = modal.querySelector('.modal-close');
+        if (closeButton) {
+          closeButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.closeModal(modal);
+          });
+        }
+
+        const backdrop = modal.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.addEventListener('click', () => {
+            if (options.closeOnBackdrop !== false) {
+              this.closeModal(modal);
+            }
+          });
+        }
+
+        document.body.appendChild(modal);
+        this.modalStack.push(modal);
+
+        requestAnimationFrame(() => {
+          modal.classList.add('active');
+        });
+
+        return modal;
+      }
+
+      closeModal(modal) {
+        if (!modal) {
+          modal = this.modalStack[this.modalStack.length - 1];
+        }
+
+        if (!modal) return;
+
+        modal.classList.remove('active');
+
+        setTimeout(() => {
+          modal.remove();
+          this.modalStack = this.modalStack.filter(m => m !== modal);
+        }, 300);
+      }
+
+      closeTopModal() {
+        if (this.modalStack.length > 0) {
+          this.closeModal(this.modalStack[this.modalStack.length - 1]);
+        }
+      }
+
+      showToast(message, type = 'info', duration = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `ultra-toast ultra-toast-${type}`;
+
+        const icons = {
+          success: '✅',
+          error: '❌',
+          warning: '⚠️',
+          info: 'ℹ️'
+        };
+
+        toast.innerHTML = `
+          <div class="toast-icon">${icons[type] || icons.info}</div>
+          <div class="toast-message">${message}</div>
+          <button class="toast-close" aria-label="Close">×</button>
+        `;
+
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => {
+          this.removeToast(toast);
+        });
+
+        const container = this.getToastContainer();
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.add('active');
+        });
+
+        if (duration > 0) {
+          setTimeout(() => {
+            this.removeToast(toast);
+          }, duration);
+        }
+
+        return toast;
+      }
+
+      removeToast(toast) {
+        toast.classList.remove('active');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }
+
+      getToastContainer() {
+        let container = document.getElementById('ultra-toasts');
+        if (!container) {
+          container = document.createElement('div');
+          container.id = 'ultra-toasts';
+          container.className = 'ultra-toasts';
+          document.body.appendChild(container);
+        }
+        return container;
+      }
+
+      showError(message) {
+        this.showModal(`
+          <div class="error-screen">
+            <div class="error-icon">❌</div>
+            <h2>Error</h2>
+            <p>${message}</p>
+            <button class="ultra-btn ultra-btn-primary" onclick="location.reload()">
+              Reload Page
+            </button>
+          </div>
+        `, {
+          closeOnBackdrop: false,
+          showClose: false
+        });
+      }
+
+      showHelp() {
+        const content = `
+          <div class="help-ultra">
+            <h2>Keyboard Shortcuts</h2>
+            <div class="shortcuts-grid">
+              <div class="shortcut-item">
+                <kbd>⌘ K</kbd>
+                <span>Command Palette</span>
+              </div>
+              <div class="shortcut-item">
+                <kbd>⌘ S</kbd>
+                <span>Save Game</span>
+              </div>
+              <div class="shortcut-item">
+                <kbd>ESC</kbd>
+                <span>Close Modal</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        this.showModal(content);
+      }
+    }
+
+    class AudioSystem {
+      constructor(game) {
+        this.game = game;
+        this.sounds = new Map();
+        this.muted = false;
+        this.volume = 0.3;
+      }
+
+      async loadSounds() {
+        const soundEffects = {
+          'button-click': { frequency: 400, duration: 50 },
+          'modal-open': { frequency: 800, duration: 100 },
+          'modal-close': { frequency: 600, duration: 100 },
+          'toast-success': { frequency: 880, duration: 150 },
+          'toast-error': { frequency: 200, duration: 150 },
+          'save': { frequency: 1000, duration: 200 }
+        };
+
+        for (const [name, config] of Object.entries(soundEffects)) {
+          this.sounds.set(name, this.createSound(config));
+        }
+      }
+
+      createSound(config) {
+        return () => {
+          if (this.muted) return;
+
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            oscillator.frequency.value = config.frequency;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(this.volume * 0.1, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + config.duration / 1000);
+
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + config.duration / 1000);
+          } catch (e) {
+            // Silently fail if audio context not available
+          }
+        };
+      }
+
+      playSound(name) {
+        const sound = this.sounds.get(name);
+        if (sound) {
+          try {
+            sound();
+          } catch (e) {
+            console.warn('Failed to play sound:', name);
+          }
+        }
+      }
+    }
+
+    class CommandPalette {
+      constructor(game) {
+        this.game = game;
+        this.isOpen = false;
+        this.commands = [
+          {
+            id: 'launch-demo',
+            title: 'Launch Demo',
+            icon: '🎬',
+            action: () => this.game.launchDemo(),
+            keywords: ['demo', 'tutorial', 'start']
+          },
+          {
+            id: 'start-mission',
+            title: 'Start Mission',
+            icon: '🚀',
+            action: () => this.game.showMissionSelect(),
+            keywords: ['mission', 'scenario', 'start']
+          },
+          {
+            id: 'ioc-library',
+            title: 'Open IOC Library',
+            icon: '🔬',
+            action: () => this.game.openIOCLibrary(),
+            keywords: ['ioc', 'threat', 'intelligence']
+          },
+          {
+            id: 'main-menu',
+            title: 'Main Menu',
+            icon: '🏠',
+            action: () => this.game.showMainMenu(),
+            keywords: ['home', 'menu', 'main']
+          }
+        ];
+      }
+
+      toggle() {
+        if (this.isOpen) {
+          this.close();
+        } else {
+          this.open();
+        }
+      }
+
+      open() {
+        if (this.isOpen) return;
+        this.isOpen = true;
+
+        const palette = document.createElement('div');
+        palette.id = 'command-palette';
+        palette.className = 'command-palette';
+        palette.innerHTML = `
+          <div class="palette-backdrop"></div>
+          <div class="palette-container">
+            <div class="palette-search">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Type a command..." class="search-input" autofocus />
+            </div>
+            <div class="palette-results" id="palette-results">
+              ${this.renderCommands(this.commands)}
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(palette);
+
+        const input = palette.querySelector('.search-input');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            this.close();
+          }
+        });
+
+        const backdrop = palette.querySelector('.palette-backdrop');
+        backdrop.addEventListener('click', () => this.close());
+
+        this.attachCommandListeners();
+
+        requestAnimationFrame(() => {
+          palette.classList.add('active');
+        });
+      }
+
+      close() {
+        if (!this.isOpen) return;
+
+        const palette = document.getElementById('command-palette');
+        if (palette) {
+          palette.classList.remove('active');
+          setTimeout(() => {
+            palette.remove();
+          }, 200);
+        }
+
+        this.isOpen = false;
+      }
+
+      renderCommands(commands) {
+        return commands.map(cmd => `
+          <button class="palette-item" data-command="${cmd.id}">
+            <span class="item-icon">${cmd.icon}</span>
+            <span class="item-title">${cmd.title}</span>
+          </button>
+        `).join('');
+      }
+
+      attachCommandListeners() {
+        document.querySelectorAll('.palette-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const cmdId = item.dataset.command;
+            this.execute(cmdId);
+          });
+        });
+      }
+
+      execute(commandId) {
+        const command = this.commands.find(cmd => cmd.id === commandId);
+        if (command) {
+          this.close();
+          command.action();
+        }
+      }
+    }
+  </script>
+
+  <!-- 3. Load main game engine -->
+  <script src="game-engine-v5-functional.js"></script>
+
+  <!-- Hide loader when ready -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          loader.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => loader.remove(), 500);
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>
