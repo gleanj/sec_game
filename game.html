@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response: The Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="game-styles.css">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-gradient"></div>
+
+    <!-- Main Container -->
+    <div id="app" class="app-container">
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="glitch-wrapper">
+                    <h1 class="game-title" data-text="INCIDENT RESPONSE">INCIDENT RESPONSE</h1>
+                    <div class="subtitle">THE GAME</div>
+                </div>
+
+                <div class="mission-briefing">
+                    <div class="briefing-header">MISSION BRIEFING</div>
+                    <div class="briefing-content">
+                        <p>You are the <span class="highlight">lead incident responder</span> for CyberCorp Industries.</p>
+                        <p>A critical <span class="danger">ransomware attack</span> is in progress.</p>
+                        <p>Your decisions will determine the <span class="highlight">fate of the company</span>.</p>
+                    </div>
+                </div>
+
+                <div class="game-features">
+                    <div class="feature">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Multiple Scenarios</div>
+                            <div class="feature-desc">Navigate through complex incident response decisions</div>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Dynamic Outcomes</div>
+                            <div class="feature-desc">Every choice impacts your score and reputation</div>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Real-Time Pressure</div>
+                            <div class="feature-desc">Make critical decisions under time constraints</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="difficulty-selector">
+                    <div class="difficulty-header">SELECT DIFFICULTY</div>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn" data-difficulty="easy">
+                            <div class="diff-name">TRAINING MODE</div>
+                            <div class="diff-desc">More time, helpful hints</div>
+                        </button>
+                        <button class="difficulty-btn active" data-difficulty="normal">
+                            <div class="diff-name">PROFESSIONAL</div>
+                            <div class="diff-desc">Standard incident response</div>
+                        </button>
+                        <button class="difficulty-btn" data-difficulty="hard">
+                            <div class="diff-name">CRISIS MODE</div>
+                            <div class="diff-desc">High pressure, no hints</div>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="start-btn" id="start-game-btn">
+                    <span class="btn-text">BEGIN INCIDENT RESPONSE</span>
+                    <span class="btn-glow"></span>
+                </button>
+
+                <div class="saved-games" id="saved-games-section" style="display: none;">
+                    <div class="saved-header">CONTINUE PREVIOUS SESSION</div>
+                    <div id="saved-games-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- HUD -->
+            <div class="hud">
+                <div class="hud-left">
+                    <div class="hud-item">
+                        <div class="hud-label">SCORE</div>
+                        <div class="hud-value" id="score-display">0</div>
+                    </div>
+                    <div class="hud-item">
+                        <div class="hud-label">REPUTATION</div>
+                        <div class="hud-value reputation" id="reputation-display">100%</div>
+                    </div>
+                    <div class="hud-item">
+                        <div class="hud-label">TIME ELAPSED</div>
+                        <div class="hud-value" id="time-display">0m</div>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="hud-item">
+                        <div class="hud-label">CONTAINMENT</div>
+                        <div class="containment-bar">
+                            <div class="containment-fill" id="containment-fill" style="width: 0%"></div>
+                            <div class="containment-text" id="containment-text">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenario Container -->
+            <div class="scenario-container">
+                <div class="scenario-header">
+                    <div class="scenario-number" id="scenario-number">SCENARIO 1</div>
+                    <div class="scenario-title" id="scenario-title">INITIAL DETECTION</div>
+                </div>
+
+                <div class="scenario-content">
+                    <div class="scenario-text" id="scenario-text"></div>
+
+                    <div class="alert-box" id="alert-box" style="display: none;">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-text" id="alert-text"></div>
+                    </div>
+                </div>
+
+                <div class="choices-container" id="choices-container">
+                    <!-- Choices will be dynamically inserted -->
+                </div>
+
+                <div class="feedback-container" id="feedback-container" style="display: none;">
+                    <div class="feedback-content" id="feedback-content"></div>
+                    <button class="continue-btn" id="continue-btn">
+                        <span>CONTINUE →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Decision Timeline -->
+            <div class="timeline" id="timeline">
+                <div class="timeline-header">DECISION TIMELINE</div>
+                <div class="timeline-items" id="timeline-items"></div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <div class="results-content">
+                <div class="ending-badge" id="ending-badge">
+                    <div class="ending-rank" id="ending-rank">EXEMPLARY</div>
+                    <div class="ending-title" id="ending-title">SECURITY HERO</div>
+                </div>
+
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">FINAL SCORE</div>
+                        <div class="stat-value large" id="final-score">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">REPUTATION</div>
+                        <div class="stat-value" id="final-reputation">100%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">TIME TO RESOLUTION</div>
+                        <div class="stat-value" id="final-time">0h</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">CONTAINMENT</div>
+                        <div class="stat-value" id="final-containment">0%</div>
+                    </div>
+                </div>
+
+                <div class="outcome-description" id="outcome-description"></div>
+
+                <div class="achievements" id="achievements-section" style="display: none;">
+                    <div class="achievements-header">ACHIEVEMENTS UNLOCKED</div>
+                    <div class="achievements-list" id="achievements-list"></div>
+                </div>
+
+                <div class="decision-summary">
+                    <div class="summary-header">YOUR DECISION PATH</div>
+                    <div class="summary-items" id="summary-items"></div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="action-btn primary" id="play-again-btn">
+                        <span>PLAY AGAIN</span>
+                    </button>
+                    <button class="action-btn secondary" id="share-btn">
+                        <span>SHARE RESULTS</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="game-engine.js"></script>
+</body>
+</html>

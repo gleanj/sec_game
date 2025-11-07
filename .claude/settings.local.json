@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command \"Stop-Process -Id 9100 -Force\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
