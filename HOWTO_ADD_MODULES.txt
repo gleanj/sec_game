@@ -1,0 +1,39 @@
+INSTRUCTIONS TO ADD MODULES 4, 5, 6
+====================================
+
+1. Open script.js in VSCode
+2. Find the line that says:    addOutput('<div class="info-line mt-2 text-center">More modules coming soon...</div>');
+3. Replace "More modules coming soon..." with "Type <span style=\"color: #00d4ff;\">start module 4</span> for the next episode..."
+
+4. Right BEFORE the comment "// Command System", copy and paste ALL the code from modules_456.txt
+
+5. Find this section in the start command:
+            } else if (moduleNum === '3') {
+                await executeModule3();
+                return null;
+            } else {
+                return `<div class="error-line">Module ${moduleNum} not found</div>
+<div class="result-line">Available modules: 1-3</div>`;
+
+6. Replace it with:
+            } else if (moduleNum === '3') {
+                await executeModule3();
+                return null;
+            } else if (moduleNum === '4') {
+                await executeModule4();
+                return null;
+            } else if (moduleNum === '5') {
+                await executeModule5();
+                return null;
+            } else if (moduleNum === '6') {
+                await executeModule6();
+                return null;
+            } else {
+                return `<div class="error-line">Module ${moduleNum} not found</div>
+<div class="result-line">Available modules: 1-6</div>`;
+
+7. Update the help command to show "start module [1-6]" instead of [1-3]
+
+8. Save and refresh your browser!
+
+OR - I can try to do this automatically for you if you want.
