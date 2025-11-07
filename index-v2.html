@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CyberSim Pro - World-Class Incident Response Training Platform">
+  <title>CyberSim Pro - Incident Response Training</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="game-styles-v2.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+  <!-- Main Container -->
+  <div id="root">
+    <!-- Landing Page -->
+    <div id="landing-page" class="landing-page">
+      <div class="landing-content">
+        <header class="landing-header">
+          <h1 class="landing-title">
+            <span class="title-icon">🛡️</span>
+            CyberSim Pro
+          </h1>
+          <p class="landing-subtitle">World-Class Incident Response Training Platform</p>
+        </header>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>20+ Realistic Scenarios</h3>
+            <p>Ransomware, APT, DDoS, Insider Threats, Supply Chain attacks, and more</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔬</div>
+            <h3>Professional Security Tools</h3>
+            <p>SIEM, EDR, Forensics, Threat Intel, Network Analysis</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🌳</div>
+            <h3>Skill Tree Progression</h3>
+            <p>Advance from Junior Analyst to CISO with 30+ unlockable skills</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>AI Mentor System</h3>
+            <p>Adaptive hints and guidance based on your performance</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <h3>Achievements & Certifications</h3>
+            <p>Earn badges and prepare for GCIH, CISSP, CEH certifications</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Team Multiplayer</h3>
+            <p>Collaborate with teammates on incident response</p>
+          </div>
+        </div>
+
+        <div class="cta-section">
+          <button class="btn-primary btn-large" onclick="showMainMenu()">
+            Start Training
+          </button>
+          <button class="btn-secondary btn-large" onclick="showAbout()">
+            Learn More
+          </button>
+        </div>
+
+        <div class="landing-footer">
+          <p>Based on NIST CSF, MITRE ATT&CK, and real-world incident response methodologies</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="main-menu" style="display: none;">
+      <div class="menu-content">
+        <h1 class="menu-title">CyberSim Pro</h1>
+
+        <div class="menu-options">
+          <button class="menu-btn" onclick="showScenarioSelect()">
+            <span class="menu-icon">🎯</span>
+            <div class="menu-btn-content">
+              <h3>Campaign Mode</h3>
+              <p>Progress through scenarios and build your skills</p>
+            </div>
+          </button>
+
+          <button class="menu-btn" onclick="showQuickPlay()">
+            <span class="menu-icon">⚡</span>
+            <div class="menu-btn-content">
+              <h3>Quick Play</h3>
+              <p>Jump into any unlocked scenario</p>
+            </div>
+          </button>
+
+          <button class="menu-btn" onclick="showMultiplayer()">
+            <span class="menu-icon">👥</span>
+            <div class="menu-btn-content">
+              <h3>Multiplayer</h3>
+              <p>Team up for collaborative incident response</p>
+            </div>
+          </button>
+
+          <button class="menu-btn" onclick="showTraining()">
+            <span class="menu-icon">📚</span>
+            <div class="menu-btn-content">
+              <h3>Training Modules</h3>
+              <p>Learn incident response fundamentals</p>
+            </div>
+          </button>
+
+          <button class="menu-btn" onclick="showProfile()">
+            <span class="menu-icon">👤</span>
+            <div class="menu-btn-content">
+              <h3>Profile & Progress</h3>
+              <p>View stats, achievements, and skill tree</p>
+            </div>
+          </button>
+
+          <button class="menu-btn" onclick="showSettings()">
+            <span class="menu-icon">⚙️</span>
+            <div class="menu-btn-content">
+              <h3>Settings</h3>
+              <p>Configure game preferences</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Container (populated dynamically) -->
+    <div id="game-container"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="game-engine-v2.js"></script>
+  <script src="systems/tool-simulator.js"></script>
+  <script src="systems/scenario-library.js"></script>
+  <script src="systems/progression-system.js"></script>
+  <script src="systems/support-systems.js"></script>
+
+  <!-- Navigation Scripts -->
+  <script>
+    function showMainMenu() {
+      document.getElementById('landing-page').style.display = 'none';
+      document.getElementById('main-menu').style.display = 'flex';
+    }
+
+    function showScenarioSelect() {
+      // Hide menu and show scenario selection
+      document.getElementById('main-menu').style.display = 'none';
+      renderScenarioSelection();
+    }
+
+    function renderScenarioSelection() {
+      const container = document.getElementById('game-container');
+      const scenarios = game.scenarios.getAllScenarios();
+
+      const html = `
+        <div class="scenario-selection">
+          <div class="selection-header">
+            <h1>Select Scenario</h1>
+            <button class="btn-secondary" onclick="showMainMenu()">Back to Menu</button>
+          </div>
+
+          <div class="scenario-grid">
+            ${scenarios.map(scenario => `
+              <div class="scenario-card ${game.progression.meetsRequirements(scenario.requirements) ? '' : 'locked'}">
+                <div class="scenario-header">
+                  <h3>${scenario.title}</h3>
+                  <span class="difficulty-badge ${scenario.difficulty}">${scenario.difficulty}</span>
+                </div>
+                <div class="scenario-meta">
+                  <span>⏱️ ${scenario.estimatedTime || '45'} min</span>
+                  <span>🏢 ${scenario.industry}</span>
+                  <span>⚠️ ${scenario.severity}</span>
+                </div>
+                <p class="scenario-description">${scenario.description}</p>
+                ${game.progression.meetsRequirements(scenario.requirements) ? `
+                  <button class="btn-primary" onclick="game.startScenario('${scenario.id}')">
+                    Start Scenario
+                  </button>
+                ` : `
+                  <div class="locked-message">
+                    🔒 Requires Level ${scenario.requirements.level}
+                  </div>
+                `}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function showQuickPlay() {
+      showScenarioSelect();
+    }
+
+    function showMultiplayer() {
+      game.showNotification('Multiplayer features coming soon!', 'info');
+    }
+
+    function showTraining() {
+      game.showNotification('Training modules coming soon!', 'info');
+    }
+
+    function showProfile() {
+      const container = document.getElementById('game-container');
+      document.getElementById('main-menu').style.display = 'none';
+
+      const player = game.state.player;
+
+      container.innerHTML = `
+        <div class="profile-page">
+          <div class="profile-header">
+            <h1>Player Profile</h1>
+            <button class="btn-secondary" onclick="showMainMenu()">Back to Menu</button>
+          </div>
+
+          <div class="profile-content">
+            <div class="profile-card">
+              <h2>${player.rank}</h2>
+              <div class="level-display">
+                <span class="level-number">Level ${player.level}</span>
+                <div class="xp-bar">
+                  <div class="xp-fill" style="width: 60%"></div>
+                </div>
+                <span class="xp-text">${player.xp} XP</span>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">${player.statistics.scenariosCompleted}</div>
+                <div class="stat-label">Scenarios Completed</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${player.achievements.length}</div>
+                <div class="stat-label">Achievements</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${player.skillPoints}</div>
+                <div class="stat-label">Skill Points</div>
+              </div>
+            </div>
+
+            <button class="btn-primary" onclick="game.progression.showSkillTree()">
+              View Skill Tree
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function showSettings() {
+      game.showSettings();
+    }
+
+    function showAbout() {
+      const aboutHTML = `
+        <div class="about-modal">
+          <h1>About CyberSim Pro</h1>
+          <p>CyberSim Pro is a world-class incident response training platform that simulates realistic cybersecurity incidents.</p>
+
+          <h2>Features</h2>
+          <ul>
+            <li>20+ diverse scenarios covering all major attack types</li>
+            <li>Professional security tool simulations (SIEM, EDR, Forensics)</li>
+            <li>RPG-style progression with skill trees</li>
+            <li>AI mentor providing adaptive guidance</li>
+            <li>Achievements and certification preparation</li>
+            <li>Team multiplayer capabilities</li>
+          </ul>
+
+          <h2>Learning Objectives</h2>
+          <p>Based on industry frameworks including NIST CSF, MITRE ATT&CK, SANS Incident Response methodology, and compliance requirements (GDPR, HIPAA, PCI-DSS).</p>
+
+          <button class="btn-primary" onclick="game.closeModal()">Close</button>
+        </div>
+      `;
+
+      game.showModal(aboutHTML);
+    }
+  </script>
+
+  <style>
+    /* Landing Page Styles */
+    .landing-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .landing-content {
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .landing-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .landing-title {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .landing-subtitle {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+      text-align: center;
+      transition: all var(--transition-base);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon-blue);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn-large {
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+    }
+
+    .landing-footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Main Menu Styles */
+    .main-menu {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .menu-content {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .menu-title {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 3rem;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .menu-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      text-align: left;
+      transition: all var(--transition-base);
+      width: 100%;
+    }
+
+    .menu-btn:hover {
+      border-color: var(--neon-blue);
+      transform: translateX(8px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .menu-icon {
+      font-size: 3rem;
+    }
+
+    .menu-btn-content h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-primary);
+    }
+
+    .menu-btn-content p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Scenario Selection */
+    .scenario-selection {
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .selection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .scenario-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      transition: all var(--transition-base);
+    }
+
+    .scenario-card:not(.locked):hover {
+      border-color: var(--neon-blue);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .scenario-card.locked {
+      opacity: 0.5;
+    }
+
+    .scenario-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .difficulty-badge {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .difficulty-badge.normal {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+    }
+
+    .difficulty-badge.hard {
+      background: rgba(255, 221, 0, 0.2);
+      color: var(--warning);
+    }
+
+    .difficulty-badge.expert {
+      background: rgba(255, 51, 102, 0.2);
+      color: var(--error);
+    }
+
+    .scenario-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .scenario-description {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .locked-message {
+      text-align: center;
+      padding: 1rem;
+      background: var(--bg-tertiary);
+      border-radius: var(--border-radius);
+      color: var(--text-muted);
+    }
+  </style>
+</body>
+</html>
